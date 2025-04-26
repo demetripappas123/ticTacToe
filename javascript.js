@@ -72,37 +72,66 @@ let gameplay = function(){
         return { gameOver, winner };
     }
 
+    let mode = player1Mode;
 
-    while(gameOver == 0){
-        if(player1Mode == "X"){
+    const boxButtons = display();
+
+   
+    boxButtons.array.forEach(element => {
+        element.addEventListener("click",(event)=>{
+            const button = event.currentTarget;
             
-        }
-        let [p1r,p1c] = (prompt("Enter player 1 square (row,col): ")).split(",").map(Number);
-        while(board[p1r][p1c] != "-"){
-            [p1r, p1c] = (prompt("Square taken, try again: ")).split(",").map(Number);
-        }
-        player1(board, p1r, p1c);
+            if(button.textContent !== "-"){
+                alert("spot's taken bub");
+                return;
+            }
+            button.textContent = mode;
+            let [theRow, theColumn] = button.id.split(" ").map(Number);
 
-        let checked = check();
-        console.log(board);
-        gameOver = checked.gameOver;
-        console.log(gameOver);
-        if(gameOver){
-            break;
-        }
-        
-        let [p2r, p2c] = (prompt("Enter player 2 square (row, col): ")).split(",").map(Number);
-        while(board[p2r][p2c] != "-"){
-            [p2r, p2c] = (prompt("Square taken, try again: ")).split(",").map(Number);
-        }
-        player2(board, p2r, p2c);
-    }    
+            if(mode === player1Mode){
+                player1(board,theRow, theColumn);
+            }
+            else{
+                player2(board,theRow,theColumn);
+            }
+            mode = (mode === player1Mode)? player2Mode:player1Mode;
+            const checked = check();
+            gameOver = checked.gameOver;
+            winner = checked.winner;
+            if(gameOver){
+                alert(winner + 'won');
+                return;
+            }
 
-    alert(winner + "won");
+        });
+    }); 
+   
     return {winner};
 }
 
-const display = function (){
-    const container = document.getElementById("container");
-    const selector = 
-}
+const display = function () {
+    const container = document.createElement("div");
+    container.style.display = "grid";
+    container.style.gridTemplateRows = "repeat(3, 100px)";
+    container.style.gridTemplateColumns = "repeat(3, 100px)";
+    container.style.gap = "5px";
+    document.body.appendChild(container);
+
+    let index = 0;
+    for (let row = 0; row < 3; row++) {
+        for (let column = 0; column < 3; column++) {
+            let button = document.createElement("button");
+            button.setAttribute("class", "box");
+            button.setAttribute("id", `${row} ${column}`);
+            button.textContent = "-";
+            container.appendChild(button);
+            index++;
+        }
+    }
+
+    const boxButtons = container.querySelectorAll(".box");
+    console.log("display Ran");
+    return { array: boxButtons };
+};
+
+gameplay();
